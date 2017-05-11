@@ -1,4 +1,13 @@
+local OutButtons = {}
 
+OutButtons.A = 0
+OutButtons.B = 0
+OutButtons.L = 0
+OutButtons.R = 0
+OutButtons.up = 0
+OutButtons.down = 0
+OutButtons.left = 0
+OutButtons.right = 0
 
 function ShowInputKeys()
 	local y = 59
@@ -87,6 +96,8 @@ function nodeRepresentation(distX,distY,dir)
 	gui.box(102,68,106,72,"red") -- Rival Marking at Origin of the graph
 	gui.box(playerBoxD.x1,playerBoxD.y1,playerBoxD.x2,playerBoxD.y2,"blue")
 
+	return {playerX,playerY}
+
 end
 
 function generateOverlays()
@@ -111,15 +122,19 @@ function generateOverlays()
 	local HealthAddressSelf = 0x0300273E
 	local hpSelf
 
-	while true do
+
 		yDist=memory.readword(Ydistaddress)
 		xDist=memory.readword(Xdistaddress)
 
 		hpSelf = tonumber("000000" .. string.sub(bit.tohex(memory.readword(HealthAddressSelf)),7,8),16)
 		kiSelf = memory.readword(KIaddressSelf)
 		p = tonumber("000000" .. string.sub(bit.tohex(memory.readword(polarCoodAddress)),7,8),16)
-		hpEnemy = memory.readword(HealthAddressEnemy)
+		hpEnemy = memory.readbyte(HealthAddressEnemy)
 		kiEnemy = memory.readword(KIAddressEnemy)
+
+		if(hpSelf == 0 or hpEnemy ==0) then
+
+		end
 
 		dir = playerPosCood(p)
 
@@ -130,17 +145,82 @@ function generateOverlays()
 		gui.text(200,43,string.format("KI : %d",kiEnemy))
 
 		ShowInputKeys()
-		nodeRepresentation(xDist,yDist,dir)
+		xy = nodeRepresentation(xDist,yDist,dir)
 
-		j = joypad.get(2)
 
-		if j.A then
-			io.write("A")
+	return {x = xy[1], y = xy[2], HPPlayer = hpSelf, HPEnemy = hpEnemy, KIPlayer = kiSelf, KIEnemy = kiEnemy}
+
+
+end
+
+function OutputOverlays(OUTPUTS)
+	y = 59
+	i = 1
+	for k,v in pairs(OUTPUTS) do
+		text = k
+		gui.text(43,y+8*i,k..v)
+		i = i+1
+	end
+end
+
+function convertOutputsToControls(OUTPUTS)
+
+	local controlTable = OutButtons
+	local outputsToControlConversion = {}
+
+	index = 1
+	for k,v in pairs(OutButtons) do
+
+		if OUTPUTS[index] > 0.5 then
+			val = 1
+		elseif OUTPUTS[index] < 0.5 then
+			val = nil
 		end
-
-
-		emu.frameadvance()
-
+		OutButtons[k] = val
+		outputsToControlConversion[k] = v
+		index = index + 1
 
 	end
+
+	joypad.set(1,OutButtons)
+	return outputsToControlConversion
+end
+
+
+function normalizeControls()
+	local OutButtons = {}
+
+	OutButtons.A = 0
+	OutButtons.B = 0
+	OutButtons.L = 0
+	OutButtons.R = 0
+	OutButtons.up = 0
+	OutButtons.down = 0
+	OutButtons.left = 0
+	OutButtons.right = 0
+
+
+	joypad.set(1,OutButtons)
+
+end
+
+function getFrameNumber()
+
+	local framen = vba.framecount()
+
+	return framen
+
+end
+
+function processOverlay(a,b,c,e)
+
+
+	gui.text(10,140,"Generation : ".. a)
+	gui.text(80,140,"Species : " .. b)
+	gui.text(140,140,"Organism : ".. c)
+	--gui.text(10,148,"Max Fitness : "..MaxFitness)
+	if e then
+		gui.text(80,148,"Current Fitness : ".. e)
+	end
+	print("gen :"..a.." species :"..b.." organism :"..c.." fitness :"..e)
 end
