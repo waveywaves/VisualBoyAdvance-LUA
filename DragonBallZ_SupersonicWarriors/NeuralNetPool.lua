@@ -1,6 +1,6 @@
 require("NeuralNet")
-local nOrganisms = 50
-local nSpecies = 20
+local nOrganisms = 10
+local nSpecies = 10
 
 
 function instantiateGenerationOne(topology)

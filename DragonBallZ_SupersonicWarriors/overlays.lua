@@ -182,9 +182,6 @@ function convertOutputsToControls(OUTPUTS)
 
 	end
 
-	print(OutButtons)
-
-	print(OUTPUTS)
 	joypad.set(1,OutButtons)
 	return OutButtons
 end

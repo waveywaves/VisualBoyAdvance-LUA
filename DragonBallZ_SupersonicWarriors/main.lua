@@ -55,6 +55,7 @@ while true do
 	if (genIndex == 1) then
 		if (NeuralNetIndex <= #Generation) then
 			i = NeuralNetIndex
+			speciesIndex = NeuralNetIndex
 			currentNetwork = Generation[NeuralNetIndex]
 
 			INPUTS = generateOverlays()
@@ -86,6 +87,7 @@ while true do
 
 			elseif nextNet then
 				NeuralNetIndex = NeuralNetIndex + 1
+				speciesIndex = NeuralNetIndex
 				nextNet = false
 				normalizeControls()
 			end
@@ -94,8 +96,8 @@ while true do
 	elseif(genIndex >1) then
 			i = speciesIndex
 
-			if (NeuralNetIndex <= #Generation[i])  then
-			currentNetwork = Generation[i][NeuralNetIndex]
+			if (NeuralNetIndex <= #Generation[speciesIndex])  then
+			currentNetwork = Generation[speciesIndex][NeuralNetIndex]
 
 			INPUTS = generateOverlays()
 			if KItable then
@@ -134,7 +136,7 @@ while true do
 			normalizeControls()
 		end
 	end
-	processOverlay(genIndex,i,NeuralNetIndex,currentNetwork.fitness)
+	processOverlay(genIndex,speciesIndex,NeuralNetIndex,currentNetwork.fitness)
 	emu.frameadvance()
 
 end
