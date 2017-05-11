@@ -1,13 +1,4 @@
-local OutButtons = {}
 
-OutButtons.A = 0
-OutButtons.B = 0
-OutButtons.L = 0
-OutButtons.R = 0
-OutButtons.up = 0
-OutButtons.down = 0
-OutButtons.left = 0
-OutButtons.right = 0
 
 function ShowInputKeys()
 	local y = 59
@@ -164,30 +155,6 @@ function OutputOverlays(OUTPUTS)
 end
 
 function convertOutputsToControls(OUTPUTS)
-
-	local controlTable = OutButtons
-	local outputsToControlConversion = {}
-
-	index = 1
-	for k,v in pairs(OutButtons) do
-
-		if OUTPUTS[index] > 0.5 then
-			val = 1
-		elseif OUTPUTS[index] < 0.5 then
-			val = nil
-		end
-		OutButtons[k] = val
-		outputsToControlConversion[k] = v
-		index = index + 1
-
-	end
-
-	joypad.set(1,OutButtons)
-	return outputsToControlConversion
-end
-
-
-function normalizeControls()
 	local OutButtons = {}
 
 	OutButtons.A = 0
@@ -198,6 +165,42 @@ function normalizeControls()
 	OutButtons.down = 0
 	OutButtons.left = 0
 	OutButtons.right = 0
+
+	local controlTable = OutButtons
+	local outputsToControlConversion = {}
+
+	index = 1
+	for k,v in pairs(OutButtons) do
+
+		if OUTPUTS[index] > 0 then
+			val = 1
+		elseif OUTPUTS[index] <= 0 then
+			val = nil
+		end
+		OutButtons[k] = val
+		index = index + 1
+
+	end
+
+	print(OutButtons)
+
+	print(OUTPUTS)
+	joypad.set(1,OutButtons)
+	return OutButtons
+end
+
+
+function normalizeControls()
+	local OutButtons = {}
+
+	OutButtons.A = nil
+	OutButtons.B = nil
+	OutButtons.L = nil
+	OutButtons.R = nil
+	OutButtons.up = nil
+	OutButtons.down = nil
+	OutButtons.left = nil
+	OutButtons.right = nil
 
 
 	joypad.set(1,OutButtons)

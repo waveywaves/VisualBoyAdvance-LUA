@@ -1,6 +1,6 @@
 require("NeuralNet")
-local nOrganisms = 8
-local nSpecies = 10
+local nOrganisms = 50
+local nSpecies = 20
 
 
 function instantiateGenerationOne(topology)
@@ -13,7 +13,7 @@ function instantiateGenerationOne(topology)
 	for i=1,nOrganisms do
 		newNN = instantiateNeuralNetwork(topology)
 
-		for j=1,2 do
+		for j=1,1 do
 			newNN.GlobalLinkSink   = mutateNeuralNetworkLinks(newNN)
 			newNN.GlobalLinkSink   = mutateNeuralNetworkLinkWeights(newNN)
 			newNN.GlobalLinkSink = mutateNeuralNetworkLinkStructure(newNN)

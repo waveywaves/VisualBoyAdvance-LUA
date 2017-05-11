@@ -45,7 +45,7 @@ end
 
 Generation = instantiateGenerationOne({6,8})
 
-
+emu.registerafter(normalizeControls)
 
 local nextNet = false
 local NeuralNetIndex = 1
@@ -136,6 +136,7 @@ while true do
 	end
 	processOverlay(genIndex,i,NeuralNetIndex,currentNetwork.fitness)
 	emu.frameadvance()
+
 end
 
 
