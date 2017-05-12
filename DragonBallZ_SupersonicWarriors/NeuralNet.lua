@@ -281,13 +281,14 @@ end
 
 function mutateNeuralNetworkNeuronBias(NeuralNetwork)
 	local NeuronSink = NeuralNetwork.GlobalNeuronSink
-	local biasWeightMutationProbability = 0.2
+	local chance = 0.90
+	local biasWeightMutatioRate= 0.2
 
 	for i=1,#NeuronSink do
 		neuron = NeuronSink[i]
-		if math.random() < biasWeightMutationProbability then
+		if math.random() < chance then
 			math.random()
-			neuron.bias = neuron.bias + math.random()
+			neuron.bias = neuron.bias + math.random()*biasWeightMutatioRate
 		end
 	end
 
@@ -297,16 +298,17 @@ end
 
 function mutateNeuralNetworkLinkWeights(NeuralNetwork)
 	local LinkSink = NeuralNetwork.GlobalLinkSink
-	local linkWeightMutationProbability = 0.5
+	local chance = 0.90
+	local linkWeightMutationRate = 0.1
 
 	for i=1,#LinkSink do
 		link = LinkSink[i]
-		if math.random() > linkWeightMutationProbability then
+		if math.random() <= chance then
 			math.random()
-			link.weight = (link.weight + math.random()/10000)
+			link.weight = (link.weight + math.random()*linkWeightMutationRate)
 			math.random()
-			if math.random()>0.5 then
-				link.weight = link.weight/2
+			if math.random() >= chance then
+				link.weight = link.weight - (link.weight/2)*linkWeightMutationRate
 			end
 		end
 	end
@@ -319,8 +321,8 @@ function mutateNeuralNetworkLinkStructure(NeuralNetwork)
 	local LinkSink = NeuralNetwork.GlobalLinkSink
 	local NeuronSink = NeuralNetwork.GlobalNeuronSink
 	local linkStructureMutationProbability = 0.1
-	local linkStructureNewNeuronProbability = 0.7
-	local linkStructureLinkWithHiddenProbability = 0.3
+	local linkStructureNewNeuronProbability = 0.2
+	local linkStructureLinkWithHiddenProbability = 0.2
 
 
 	for i=1,#LinkSink do
@@ -328,9 +330,9 @@ function mutateNeuralNetworkLinkStructure(NeuralNetwork)
 		n1 = nil
 		n2 = nil
 		n3 = nil
-		if math.random() > linkStructureMutationProbability then
-			p = math.random()
-			if p>linkStructureNewNeuronProbability and p<1 then
+		if math.random() <= linkStructureMutationProbability then
+			p = math.random(1,10)/10
+			if math.random()<linkStructureNewNeuronProbability and p<=0.5 then
 				math.random()
 
 				n1 = link.node1id
@@ -350,7 +352,7 @@ function mutateNeuralNetworkLinkStructure(NeuralNetwork)
 				table.insert(LinkSink,newLink2)
 				table.insert(NeuralNetwork.hiddenLayer, n2)
 
-			elseif p<linkStructureLinkWithHiddenProbability and  p>0 then
+			elseif math.random()<linkStructureLinkWithHiddenProbability and p>=0.5 then
 
 				math.random()
 				randomNodeid = math.random(1,#NeuronSink)

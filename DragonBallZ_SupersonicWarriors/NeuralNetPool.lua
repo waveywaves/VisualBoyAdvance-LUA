@@ -91,6 +91,7 @@ function instantiateRegularGeneration(previousGeneration)
 
 			for i=1,nSpecies-math.ceil(0.05*nSpecies) do
 				table.insert(newGeneration,instantiateSpecies(champ,FitAndDifferent))
+				print("new Species added")
 			end
 			for j=1,5 do
 				matingRing = instantiateMatingRing(FitAndDifferent)
@@ -100,7 +101,7 @@ function instantiateRegularGeneration(previousGeneration)
 					newNN.GlobalLinkSink   = mutateNeuralNetworkLinks(newNN)
 					newNN.GlobalLinkSink   = mutateNeuralNetworkLinkWeights(newNN)
 					newNN.GlobalLinkSink = mutateNeuralNetworkLinkStructure(newNN)
-					--nn.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(nn)
+					newNN.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(newNN)
 					newNN.GlobalLinkSink = LinkSinkChecker(newNN)
 					table.insert(matingRing,newNN)
 				end
@@ -119,7 +120,7 @@ function instantiateRegularGeneration(previousGeneration)
 
 		end
 
-		return newGeneration
+	return newGeneration
 end
 
 function compatibilityCheck(groupOfNNs)
@@ -252,7 +253,7 @@ function instantiateSpecies(champ,FittestOrganisms)
 			champ.GlobalLinkSink   = mutateNeuralNetworkLinks(champ)
 			champ.GlobalLinkSink   = mutateNeuralNetworkLinkWeights(champ)
 			champ.GlobalLinkSink = mutateNeuralNetworkLinkStructure(champ)
-			--nn.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(nn)
+			champ.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(champ)
 			champ.GlobalLinkSink = LinkSinkChecker(champ)
 		table.insert(newSpecies,champ)
 	end
