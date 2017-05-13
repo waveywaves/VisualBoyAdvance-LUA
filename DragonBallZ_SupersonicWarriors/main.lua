@@ -67,10 +67,9 @@ while true do
 				currentNetworkOutputs = extractOutputs(NeuralNetworkForwardPass(currentNetwork,INPUTS))
 				convertOutputsToControls(currentNetworkOutputs)
 				outputToControlConversion = convertOutputsToControls(currentNetworkOutputs)
-
 			end
 
-			if nextNet and NeuralNetIndex == #Generation[NeuralNetIndex] then
+			if nextNet and NeuralNetIndex == #Generation then
 				NeuralNetIndex = 1
 				speciesIndex = 1
 				genIndex = genIndex + 1
