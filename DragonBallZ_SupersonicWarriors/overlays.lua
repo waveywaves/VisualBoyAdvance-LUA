@@ -1,39 +1,59 @@
 
 
-function ShowInputKeys()
+function outputKeysOverlay(OUTPUTS)
 	local y = 59
-	gui.text(10,y+8, "A  ")
-	gui.text(10,y+2*8, "B  ")
-	gui.text(10,y+3*8, "L  ")
-	gui.text(10,y+4*8, "R  ")
-	gui.text(10,y+5*8, "up  ")
-	gui.text(10,y+6*8, "down  ")
-	gui.text(10,y+7*8, "left  ")
-	gui.text(10,y+8*8, "right  ")
 
-	local table={}
-	table=joypad.get(1)
+		gui.text(10,y+8, "A  ","red")
+		gui.text(10,y+2*8, "B  ","red")
+		gui.text(10,y+3*8, "L  ","red")
+		gui.text(10,y+4*8, "R  ","red")
+		gui.text(10,y+5*8, "up  ","red")
+		gui.text(10,y+6*8, "down  ","red")
+		gui.text(10,y+7*8, "left  ","red")
+		gui.text(10,y+8*8, "right  ","red")
+
+
+	local table=OUTPUTS
+	if table then
 		if table.A and table.B and table.R then
 			gui.text(10,y+9*8, "SUPER ATTACK")
-		elseif table.L and table.R then
+		end
+
+		if table.L and table.R then
 			gui.text(10,y+9*8, "SPECIAL SKILL")
-		elseif table.A then
-			gui.text(10,y+8, "A pressed")
-		elseif table.B then
-			gui.text(10,y+2*8, "B pressed")
-		elseif table.L then
-			gui.text(10,y+3*8, "L pressed")
-		elseif table.R then
-			gui.text(10,y+4*8, "R pressed")
-		elseif table.up then
-			gui.text(10,y+5*8, "up pressed")
-		elseif table.down then
-			gui.text(10,y+6*8, "down pressed")
-		elseif table.left then
-			gui.text(10,y+7*8, "left pressed")
-		elseif table.right then
-			gui.text(10,y+8*8, "right pressed")
+		end
+
+		if table.A then
+			gui.text(10,y+8, "A ","green")
+		end
+
+		if table.B then
+			gui.text(10,y+2*8, "B ","green")
+		end
+
+		if table.L then
+			gui.text(10,y+3*8, "L ","green")
+		end
+
+		if table.R then
+			gui.text(10,y+4*8, "R ","green")
+		end
+
+		if table.up then
+			gui.text(10,y+5*8, "up ","green")
+		end
+
+		if table.down then
+			gui.text(10,y+6*8, "down ","green")
+		end
+
+		if table.left then
+			gui.text(10,y+7*8, "left ","green")
+		end
+		if table.right then
+			gui.text(10,y+8*8, "right ","green")
 	    end
+	end
 end
 
 
@@ -135,7 +155,6 @@ function generateOverlays()
 		gui.text(200,35,string.format("HP : %d",hpEnemy))
 		gui.text(200,43,string.format("KI : %d",kiEnemy))
 
-		ShowInputKeys()
 		xy = nodeRepresentation(xDist,yDist,dir)
 
 
@@ -157,27 +176,62 @@ end
 function convertOutputsToControls(OUTPUTS)
 	local OutButtons = {}
 
-	OutButtons.A = 0
-	OutButtons.B = 0
-	OutButtons.L = 0
-	OutButtons.R = 0
+
 	OutButtons.up = 0
 	OutButtons.down = 0
 	OutButtons.left = 0
 	OutButtons.right = 0
+	OutButtons.A = 0
+	OutButtons.B = 0
+	OutButtons.L = 0
+	OutButtons.R = 0
 
 	local controlTable = OutButtons
 	local outputsToControlConversion = {}
 
 	index = 1
-	for k,v in pairs(OutButtons) do
+	innerIndex = 1
+	for index=1,#OUTPUTS do
 
-		if OUTPUTS[index] > 0 then
-			val = 1
-		elseif OUTPUTS[index] <= 0 then
-			val = nil
+		if index == 1 then
+			if ((OUTPUTS[index]) > 0) then
+				OutButtons.left = nil
+				OutButtons.right = 1
+			elseif ((OUTPUTS[index])< 0) then
+				OutButtons.left = 1
+				OutButtons.right = nil
+			else
+				OutButtons.left = nil
+				OutButtons.right = nil
+			end
+		elseif index == 2 then
+			if ((OUTPUTS[index]) > 0) then
+				OutButtons.up = 1
+				OutButtons.down = nil
+			elseif ((OUTPUTS[index])< 0) then
+				OutButtons.up = nil
+				OutButtons.down = 1
+			else
+				OutButtons.up = nil
+				OutButtons.down = nil
+			end
+		else
+			if ((OUTPUTS[index]) > 0) then
+				val = 1
+			elseif ((OUTPUTS[index])<= 0) then
+				val = nil
+			end
+
+			if index == 3 then
+				OutButtons.A = val
+			elseif index == 4 then
+				OutButtons.B = val
+			elseif index == 5 then
+				OutButtons.L = val
+			elseif index ==6 then
+				OutButtons.R = val
+			end
 		end
-		OutButtons[k] = val
 		index = index + 1
 
 	end
@@ -214,13 +268,25 @@ end
 
 function processOverlay(a,b,c,e)
 
-
-	gui.text(10,140,"Generation : ".. a)
-	gui.text(80,140,"Species : " .. b)
-	gui.text(140,140,"Organism : ".. c)
-	--gui.text(10,148,"Max Fitness : "..MaxFitness)
-	if e then
-		gui.text(80,148,"Current Fitness : ".. e)
+	if a and b and c and e then
+		gui.text(10,140,"Generation : ".. a)
+		gui.text(80,140,"Species : " .. b)
+		gui.text(140,140,"Organism : ".. c)
+		--gui.text(10,148,"Max Fitness : "..MaxFitness)
+		if e then
+			gui.text(80,148,"Current Fitness : ".. e)
+		end
+		print("gen :"..a.." species :"..b.." organism :"..c.." fitness :"..e)
 	end
-	print("gen :"..a.." species :"..b.." organism :"..c.." fitness :"..e)
+end
+
+function neuralNetGraphOverlay(NeuralNetwork)
+
+	local LinkSink = NeuralNetwork.GlobalLinkSink
+	local NeuronSink = NeuralNetwork.GlobalNeuronSink
+	local inputLayer = NeuralNetwork.inputLayer
+	local outputLayer = NeuralNetwork.outputLayer
+
+
+
 end

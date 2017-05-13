@@ -1,4 +1,4 @@
-math.randomseed(os.time())
+math.randomseed(os.time()/5)
 --Using seed as 12 for reproducible results and debugging
 
 function print_r ( t )
@@ -153,7 +153,6 @@ function instantiateNeuralNetwork(topology) --genes are the neurons present in a
 	local NeuralNetwork = {}
 	NeuralNetwork.GlobalNeuronSink = {}
 	NeuralNetwork.GlobalLinkSink = {}
-
 
 	NeuralNetwork.topology        = topology
 	NeuralNetwork.inputLayerSize  = topology[1]
@@ -340,7 +339,6 @@ function mutateNeuralNetworkLinkStructure(NeuralNetwork)
 				link.state = false
 
 				n2 = instantiateNeuron(NeuralNetwork)
-
 
 				newLink1 = instantiateLink(n2,n3)
 				newLink2 = instantiateLink(n1,n2)

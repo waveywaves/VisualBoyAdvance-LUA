@@ -40,12 +40,7 @@ function fillKITable(kitable,ki,nextNet)
 	return KITable
 end
 
---NeuralNetwork = instantiateNeuralNetwork({6,8})
---instantiateNeuralNetworkSpecies(NeuralNetwork)
-
-Generation = instantiateGenerationOne({6,8})
-
-emu.registerafter(normalizeControls)
+Generation = instantiateGenerationOne({6,6})
 
 local nextNet = false
 local NeuralNetIndex = 1
@@ -65,79 +60,38 @@ while true do
 				KItable = {}
 				KItable = fillKITable(KItable,INPUTS.KIPlayer,nextNet)
 			end
+			if emu.framecount()%4 == 0 then
+				stateTab = loadStateConditionCheck(INPUTS,currentNetwork,KItable)
+				nextNet = stateTab.nextNet
+				currentNetwork = stateTab.currentNet
+				currentNetworkOutputs = extractOutputs(NeuralNetworkForwardPass(currentNetwork,INPUTS))
+				convertOutputsToControls(currentNetworkOutputs)
+				outputToControlConversion = convertOutputsToControls(currentNetworkOutputs)
 
-			stateTab = loadStateConditionCheck(INPUTS,currentNetwork,KItable)
-			nextNet = stateTab.nextNet
-			currentNetwork = stateTab.currentNet
-			currentNetworkOutputs = extractOutputs(NeuralNetworkForwardPass(currentNetwork,INPUTS))
+			end
 
-			convertOutputsToControls(currentNetworkOutputs)
-			outputToControlConversion = convertOutputsToControls(currentNetworkOutputs)
-
-
-			OutputOverlays(outputToControlConversion)
-
-			if nextNet and NeuralNetIndex == #Generation then
-				Generation = instantiateRegularGeneration(Generation)
-				genIndex = genIndex + 1
+			if nextNet and NeuralNetIndex == #Generation[NeuralNetIndex] then
 				NeuralNetIndex = 1
-				nextNet = true
-				normalizeControls()
 				speciesIndex = 1
-
+				genIndex = genIndex + 1
+				Generation = instantiateRegularGeneration(Generation)
+				nextNet = false
+				normalizeControls()
 			elseif nextNet then
 				NeuralNetIndex = NeuralNetIndex + 1
-				speciesIndex = NeuralNetIndex
 				nextNet = false
 				normalizeControls()
 			end
 		end
 
 	elseif(genIndex >1) then
-			i = speciesIndex
 
-			if (NeuralNetIndex <= #Generation[speciesIndex])  then
-			currentNetwork = Generation[speciesIndex][NeuralNetIndex]
-
-			INPUTS = generateOverlays()
-			if KItable then
-				KItable = fillKITable(KItable,INPUTS.KIPlayer,nextNet)
-			else
-				KItable = {}
-				KItable = fillKITable(KItable,INPUTS.KIPlayer,nextNet)
-			end
-
-			stateTab = loadStateConditionCheck(INPUTS,currentNetwork,KItable)
-			nextNet = stateTab.nextNet
-			currentNetwork = stateTab.currentNet
-			currentNetworkOutputs = extractOutputs(NeuralNetworkForwardPass(currentNetwork,INPUTS))
-
-			convertOutputsToControls(currentNetworkOutputs)
-			outputToControlConversion = convertOutputsToControls(currentNetworkOutputs)
-
-
-			OutputOverlays(outputToControlConversion)
-
-			if nextNet and speciesIndex > #Generation[i] then
-				NeuralNetIndex = 1
-				speciesIndex = speciesIndex + 1
-				nextNet = false
-				normalizeControls()
-			elseif nextNet then
-				NeuralNetIndex = NeuralNetIndex + 1
-				nextNet = false
-				normalizeControls()
-			end
-		else
-			Generation = instantiateRegularGeneration(Generation)
-			genIndex = genIndex + 1
-			NeuralNetIndex = 1
-			nextNet = true
-			normalizeControls()
-		end
 	end
 	processOverlay(genIndex,speciesIndex,NeuralNetIndex,currentNetwork.fitness)
+	neuralNetGraphOverlay(currentNetwork)
+	outputKeysOverlay(outputToControlConversion)
 	emu.frameadvance()
+	emu.registerafter(normalizeControls)
 
 end
 

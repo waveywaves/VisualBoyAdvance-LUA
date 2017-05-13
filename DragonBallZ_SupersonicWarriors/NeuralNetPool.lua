@@ -8,16 +8,14 @@ function instantiateGenerationOne(topology)
 	local Generation = {}
 	Generation.id = 1
 
-
-
 	for i=1,nOrganisms do
 		newNN = instantiateNeuralNetwork(topology)
-
+--
 		for j=1,1 do
 			newNN.GlobalLinkSink   = mutateNeuralNetworkLinks(newNN)
 			newNN.GlobalLinkSink   = mutateNeuralNetworkLinkWeights(newNN)
 			newNN.GlobalLinkSink = mutateNeuralNetworkLinkStructure(newNN)
-			--nn.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(nn)
+			newNN.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(newNN)
 			newNN.GlobalLinkSink = LinkSinkChecker(newNN)
 		end
 
@@ -39,6 +37,7 @@ function instantiateRegularGeneration(previousGeneration)
 
 		newGeneration = {}
 		inCompatibleOrganisms = {}
+		newSpecies = {}
 
 		newGeneration.id = previousGeneration.id + 1
 		matingRing = {}
@@ -52,35 +51,29 @@ function instantiateRegularGeneration(previousGeneration)
 			-- Mean Fitness Calculation
 			local meanFitness = 0
 			for f=1,#previousGeneration do
-
 				if f ~= previousGeneration then
 					meanFitness = meanFitness + previousGeneration[f].fitness
 				else
 					meanFitness = meanFitness + previousGeneration[f].fitness
 					meanFitness = meanFitness / #previousGeneration
 				end
-
 			end
 
 			local FitAndDifferent = {}
 
 			for nn=1,#inCompatibleOrganisms do
-
 				if inCompatibleOrganisms[nn].fitness > meanFitness then
 					inCompatibleOrganisms[nn].eligibilityToFormSpecies = true
 					table.insert(FitAndDifferent,inCompatibleOrganisms[nn])
 				end
-
 			end
 
 			previousGeneration = getFitnessSorted(previousGeneration)
 
 			for nn=1,#previousGeneration do
-
-				if previousGeneration[nn].fitness	 > meanFitness then
+				if previousGeneration[nn].fitness > meanFitness then
 					table.insert(FitAndDifferent,previousGeneration[nn])
 				end
-
 			end
 
 			local champ = previousGeneration[1]
@@ -90,33 +83,25 @@ function instantiateRegularGeneration(previousGeneration)
 			--75% would be random crossovers between rest of the fittest organisms
 
 			for i=1,nSpecies-math.ceil(0.05*nSpecies) do
-				table.insert(newGeneration,instantiateSpecies(champ,FitAndDifferent))
-				print("new Species added")
+				newSpecies = instantiateSpecies(champ,FitAndDifferent)
+				table.insert(newGeneration,newSpecies)
 			end
 			for j=1,5 do
 				matingRing = instantiateMatingRing(FitAndDifferent)
 				index = math.random(1,5)
-				if (math.random() > 0.7) then
-					newNN = matingRing[index]
+				newNN = matingRing[index]
+				if (math.random() < 0.3) then
 					newNN.GlobalLinkSink   = mutateNeuralNetworkLinks(newNN)
 					newNN.GlobalLinkSink   = mutateNeuralNetworkLinkWeights(newNN)
 					newNN.GlobalLinkSink = mutateNeuralNetworkLinkStructure(newNN)
 					newNN.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(newNN)
 					newNN.GlobalLinkSink = LinkSinkChecker(newNN)
-					table.insert(matingRing,newNN)
 				end
-				table.insert(newGeneration,matingRing)
+				table.insert(matingRing,newNN)
 			end
+			table.insert(newGeneration,matingRing)
 
-		else
-
-			for s=1,#previousGeneration do
-
-				speciesTabComp = compatibilityCheck(previousGeneration[s])
-				inCompatibleOrganisms = speciesTabComp.inCompatibleOrganisms
-				previousGeneration[s] = speciesTabComp.groupOfNNs
-
-			end
+		elseif previousGeneration.id > 1 then
 
 		end
 
@@ -247,7 +232,7 @@ function instantiateSpecies(champ,FittestOrganisms)
 	local matingRing = {}
 
 	for i = 1,math.floor((0.25/2)*nOrganisms) do
-		table.insert(newSpecies,champ)
+		table.insert(newSpecies,champ) --Non-mutated Champion
 	end
 	for j = 1,math.floor((0.25/2)*nOrganisms) do
 			champ.GlobalLinkSink   = mutateNeuralNetworkLinks(champ)
@@ -255,7 +240,7 @@ function instantiateSpecies(champ,FittestOrganisms)
 			champ.GlobalLinkSink = mutateNeuralNetworkLinkStructure(champ)
 			champ.GlobalNeuronSink = mutateNeuralNetworkNeuronBias(champ)
 			champ.GlobalLinkSink = LinkSinkChecker(champ)
-		table.insert(newSpecies,champ)
+		table.insert(newSpecies,champ) --Mutated Champion
 	end
 	table.insert(FittestOrganisms,champ)
 	matingRing = instantiateMatingRing(FittestOrganisms)
